@@ -47,6 +47,8 @@
         <td><button onclick="deleteRow(this)" class="text-sm bg-red-600 text-white px-2 py-1 rounded">🗑️ Delete</button></td>
       `;
       tbody.appendChild(row);
+
+      saveTasks();
     }
 
     function addEmployeeRow() {
@@ -66,15 +68,52 @@
     function deleteRow(btn) {
       const row = btn.closest("tr");
       row.remove();
+      saveTasks();
     }
 
     function markDone(btn) {
       const row = btn.closest("tr");
       row.querySelectorAll("td")[3].innerText = "Done";
       row.classList.add("done-task");
+      saveTasks();
     }
 
-    window.onload = login;
+    function saveTasks() {
+      const rows = document.querySelectorAll("#task-table-body tr");
+      const tasks = Array.from(rows).map(row => {
+        return {
+          task: row.children[0].innerText,
+          assignedTo: row.children[1].innerText,
+          deadline: row.children[2].innerText,
+          status: row.children[3].innerText,
+          notes: row.children[4].innerText,
+        };
+      });
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function loadTasks() {
+      const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+      const tbody = document.getElementById("task-table-body");
+      tasks.forEach(task => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="py-2" contenteditable="true">${task.task}</td>
+          <td contenteditable="true">${task.assignedTo}</td>
+          <td contenteditable="true">${task.deadline}</td>
+          <td contenteditable="true">${task.status}</td>
+          <td contenteditable="true">${task.notes}</td>
+          <td><button onclick="markDone(this)" class="text-sm bg-yellow-500 text-white px-2 py-1 rounded">✅ Done</button></td>
+          <td><button onclick="deleteRow(this)" class="text-sm bg-red-600 text-white px-2 py-1 rounded">🗑️ Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    window.onload = function() {
+      login();
+      loadTasks();
+    };
   </script>
 </head>
 <body class="bg-gray-900 text-white">
@@ -103,15 +142,7 @@
             </tr>
           </thead>
           <tbody id="task-table-body">
-            <tr class="border-b border-gray-700">
-              <td class="py-2" contenteditable="true">Bridge inspection</td>
-              <td contenteditable="true">Matei</td>
-              <td contenteditable="true">2025-04-25</td>
-              <td contenteditable="true">Pending</td>
-              <td contenteditable="true">Needs follow-up photos</td>
-              <td><button onclick="markDone(this)" class="text-sm bg-yellow-500 text-white px-2 py-1 rounded">✅ Done</button></td>
-              <td><button onclick="deleteRow(this)" class="text-sm bg-red-600 text-white px-2 py-1 rounded">🗑️ Delete</button></td>
-            </tr>
+            <!-- Dynamic task rows will be loaded here -->
           </tbody>
         </table>
       </div>
