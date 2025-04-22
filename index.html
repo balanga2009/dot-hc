@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DOT HC Management Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    [contenteditable="true"]:hover {
+      outline: 2px dashed #3b82f6;
+      cursor: text;
+    }
+    .done-task {
+      background-color: #14532d;
+    }
+  </style>
+  <script>
+    const allowedPassword = "hcsecure2025";
+    let isAuthorized = false;
+
+    function login() {
+      const password = prompt("Enter High Command Password:");
+      if (password === allowedPassword) {
+        isAuthorized = true;
+        document.getElementById("hc-section").style.display = "block";
+        enableEditing();
+      } else {
+        alert("Incorrect password. Access denied.");
+      }
+    }
+
+    function enableEditing() {
+      const editables = document.querySelectorAll('[contenteditable]');
+      editables.forEach(el => el.setAttribute("contenteditable", "true"));
+    }
+
+    function addTaskRow() {
+      const tbody = document.getElementById("task-table-body");
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="py-2" contenteditable="true">New Task</td>
+        <td contenteditable="true">Assigned To</td>
+        <td contenteditable="true">YYYY-MM-DD</td>
+        <td contenteditable="true">Pending</td>
+        <td contenteditable="true">Notes</td>
+        <td><button onclick="markDone(this)" class="text-sm bg-yellow-500 text-white px-2 py-1 rounded">✅ Done</button></td>
+        <td><button onclick="deleteRow(this)" class="text-sm bg-red-600 text-white px-2 py-1 rounded">🗑️ Delete</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function addEmployeeRow() {
+      const tbody = document.getElementById("employee-table-body");
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="py-2" contenteditable="true">New Employee</td>
+        <td contenteditable="true">Rank</td>
+        <td contenteditable="true">Status</td>
+        <td contenteditable="true">YYYY-MM-DD</td>
+        <td contenteditable="true">Notes</td>
+        <td><button onclick="deleteRow(this)" class="text-sm bg-red-600 text-white px-2 py-1 rounded">🗑️ Delete</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function deleteRow(btn) {
+      const row = btn.closest("tr");
+      row.remove();
+    }
+
+    function markDone(btn) {
+      const row = btn.closest("tr");
+      row.querySelectorAll("td")[3].innerText = "Done";
+      row.classList.add("done-task");
+    }
+
+    window.onload = login;
+  </script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="container mx-auto p-8">
+    <header class="mb-10">
+      <h1 class="text-4xl font-bold mb-2" contenteditable="true">DOT High Command Management Portal</h1>
+      <p class="text-lg text-gray-300" contenteditable="true">Welcome to the central hub for task management and employee coordination.</p>
+    </header>
+
+    <section id="hc-section" class="hidden">
+      <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-10">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-semibold" contenteditable="true">Active Tasks</h2>
+          <button onclick="addTaskRow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded">➕ Add Task</button>
+        </div>
+        <table class="w-full text-left text-sm">
+          <thead class="border-b border-gray-600">
+            <tr>
+              <th class="pb-2">Task</th>
+              <th class="pb-2">Assigned To</th>
+              <th class="pb-2">Deadline</th>
+              <th class="pb-2">Status</th>
+              <th class="pb-2">Notes</th>
+              <th class="pb-2">Actions</th>
+              <th class="pb-2">Remove</th>
+            </tr>
+          </thead>
+          <tbody id="task-table-body">
+            <tr class="border-b border-gray-700">
+              <td class="py-2" contenteditable="true">Bridge inspection</td>
+              <td contenteditable="true">Matei</td>
+              <td contenteditable="true">2025-04-25</td>
+              <td contenteditable="true">Pending</td>
+              <td contenteditable="true">Needs follow-up photos</td>
+              <td><button onclick="markDone(this)" class="text-sm bg-yellow-500 text-white px-2 py-1 rounded">✅ Done</button></td>
+              <td><button onclick="deleteRow(this)" class="text-sm bg-red-600 text-white px-2 py-1 rounded">🗑️ Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-semibold" contenteditable="true">Employee Management</h2>
+          <button onclick="addEmployeeRow()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">➕ Add Employee</button>
+        </div>
+        <table class="w-full text-left text-sm">
+          <thead class="border-b border-gray-600">
+            <tr>
+              <th class="pb-2">Name</th>
+              <th class="pb-2">Rank</th>
+              <th class="pb-2">Main Task</th>
+            </tr>
+          </thead>
+          <tbody id="employee-table-body">
+            <tr class="border-b border-gray-700">
+              <td class="py-2" contenteditable="true">Matei</td>
+              <td contenteditable="true">Director</td>
+              <td contenteditable="true">Active</td>
+              <td><button onclick="deleteRow(this)" class="text-sm bg-red-600 text-white px-2 py-1 rounded">🗑️ Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="mt-10 text-center text-gray-500" contenteditable="true">
+      &copy; 2025 WGVRP DOT | High Command Portal
+    </footer>
+  </div>
+</body>
+</html>
